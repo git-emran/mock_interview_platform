@@ -7,7 +7,7 @@ const monaSans = Mona_Sans({
   subsets: ["latin"],
 }); 
 export const metadata: Metadata = {
-  title: "PrepWise",
+  title: "PrepTalk",
   description: "An AI powered platform for Mock Interview",
 };
 
