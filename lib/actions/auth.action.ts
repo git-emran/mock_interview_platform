@@ -1,9 +1,9 @@
 "use server";
 
-import { db } from "@/firebase/admin";
+import { db, auth } from "@/firebase/admin";
 import { cookies } from "next/headers";
 
-const ONE_WEEK = 60 * 60 * 24 * 7
+const ONE_WEEK = 60 * 60 * 24 * 7;
 export async function signUp(params: SignUpParams) {
   const { uid, name, email } = params;
 
@@ -20,6 +20,10 @@ export async function signUp(params: SignUpParams) {
       name,
       email,
     });
+    return {
+      success: true,
+      message: "Account created Successfully. Please Sign in"
+    }
   } catch (e: any) {
     console.error("Error creating a uesr", e);
     if (e.code === "auth/email-already-exists") {
@@ -34,18 +38,41 @@ export async function signUp(params: SignUpParams) {
     };
   }
 }
+
+export async function signIn(params: SignInParams) {
+  const { email, idToken } = params;
+
+  try {
+    const userRecord = await auth.getUserByEmail(email);
+
+    if (!userRecord) {
+      return {
+        success: false,
+        message: "User does not exist. Create an account instead",
+      };
+    }
+
+    await setSessionCookie(idToken);
+  } catch (e) {
+    console.log(e);
+    return {
+      success: false,
+      message: "Failed to Log in to account",
+    };
+  }
+}
+
 export async function setSessionCookie(idToken: string) {
-    
   const cookieStore = await cookies();
   const sessionCookie = await auth.createSessionCookie(idToken, {
-    expiresIn: ONE_WEEK * 1000
-  })
+    expiresIn: ONE_WEEK * 1000,
+  });
 
-  cookieStore.set('session', sessionCookie , {
+  cookieStore.set("session", sessionCookie, {
     maxAge: ONE_WEEK,
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    path: '/',
-    sameSite: 'lax'
-  })
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    sameSite: "lax",
+  });
 }
