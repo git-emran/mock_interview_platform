@@ -33,7 +33,7 @@ const InterviewCard = ({
             width={90}
             height={90}
           />
-          <h3 className="mt-5 capitalize ">{role} Interview</h3>
+          <h3 className="mt-5 capitalize ">{role}  Interview</h3>
           <div className="flex flex-row gap-5 mt-3">
             <div className="flex flex-row gap-2">
               <Image
